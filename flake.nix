@@ -1,7 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
-    flux.url = "github:HeartBlin/Flux";
+    fluxgrow.url = "github:HeartBlin/FluxGrow";
 
     hjem = {
       url = "github:feel-co/hjem";
@@ -14,7 +14,7 @@
     };
   };
 
-  outputs = inputs: inputs.flux.lib.mkFlake inputs ({ lib', ... }: {
+  outputs = inputs: inputs.fluxgrow.mkFlake inputs ({ lib', ... }: {
     systems = [ "x86_64-linux" ];
     packages = { pkgs, ... }: lib'.inPackages ./packages pkgs;
     hydraJobs = { system, ... }: {
