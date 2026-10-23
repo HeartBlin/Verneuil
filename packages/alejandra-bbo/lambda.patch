@@ -1,0 +1,89 @@
+diff --git a/src/alejandra/src/rules/lambda.rs b/src/alejandra/src/rules/lambda.rs
+index 9ef45ad..9a1c259 100644
+--- a/src/alejandra/src/rules/lambda.rs
++++ b/src/alejandra/src/rules/lambda.rs
+@@ -1,11 +1,36 @@
++fn is_hanging_apply(node: &rnix::SyntaxNode) -> bool {
++    if node.kind() != rnix::SyntaxKind::NODE_APPLY {
++        return false;
++    }
++
++    let last = match node.last_child() {
++        Some(last) => last,
++        None => return false,
++    };
++
++    if !matches!(
++        last.kind(),
++        rnix::SyntaxKind::NODE_ATTR_SET
++            | rnix::SyntaxKind::NODE_PAREN
++            | rnix::SyntaxKind::NODE_LIST
++    ) {
++        return false;
++    }
++
++    let head_len: usize =
++        (last.text_range().start() - node.text_range().start()).into();
++    let text = node.text().to_string();
++    let head = &text[..head_len];
++
++    !head.contains('\n') && !head.contains("/*")
++}
++
+ pub(crate) fn rule(
+     build_ctx: &crate::builder::BuildCtx,
+     node: &rnix::SyntaxNode,
+ ) -> Vec<crate::builder::Step> {
+     let mut steps = Vec::new();
+-
+     let mut children = crate::children::Children::new(build_ctx, node);
+-
+     let vertical = children.has_comments()
+         || children.has_newlines()
+         || build_ctx.vertical;
+@@ -54,18 +79,22 @@ pub(crate) fn rule(
+
+     // c
+     let child = children.get_next().unwrap();
++    let hanging_apply = child.as_node().map_or(false, is_hanging_apply);
+     if vertical {
+         if comment
+-            || !matches!(
+-                child.kind(),
+-                rnix::SyntaxKind::NODE_ATTR_SET
+-                    | rnix::SyntaxKind::NODE_PAREN
+-                    | rnix::SyntaxKind::NODE_LAMBDA
+-                    | rnix::SyntaxKind::NODE_LET_IN
+-                    | rnix::SyntaxKind::NODE_LIST
+-                    | rnix::SyntaxKind::NODE_LITERAL
+-                    | rnix::SyntaxKind::NODE_STRING
+-            )
++            || (build_ctx.indentation == 0
++                && child.kind() != rnix::SyntaxKind::NODE_LAMBDA)
++            || !(hanging_apply
++                || matches!(
++                    child.kind(),
++                    rnix::SyntaxKind::NODE_ATTR_SET
++                        | rnix::SyntaxKind::NODE_PAREN
++                        | rnix::SyntaxKind::NODE_LAMBDA
++                        | rnix::SyntaxKind::NODE_LET_IN
++                        | rnix::SyntaxKind::NODE_LIST
++                        | rnix::SyntaxKind::NODE_LITERAL
++                        | rnix::SyntaxKind::NODE_STRING
++                ))
+         {
+             let should_indent = !matches!(
+                 child.kind(),
+@@ -81,6 +110,12 @@ pub(crate) fn rule(
+                 steps.push(crate::builder::Step::Indent);
+             }
+
++            if build_ctx.indentation == 0
++                && child.kind() != rnix::SyntaxKind::NODE_LAMBDA
++            {
++                steps.push(crate::builder::Step::NewLine);
++            }
++
+             steps.push(crate::builder::Step::NewLine);
+             steps.push(crate::builder::Step::Pad);
+             steps.push(crate::builder::Step::FormatWider(child));
