@@ -10,11 +10,20 @@ permissions:
 
 jobs:
   check:
-    runs-on: [self-hosted, nixos]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: NixOS/nix-installer-action@v1.0.0
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes pipe-operator
 
       - name: Flake check
         run: nix flake check

@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   auto-update:
-    runs-on: [self-hosted, nixos]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -18,6 +18,12 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+
+      - name: Install Nix
+        uses: NixOS/nix-installer-action@v1.0.0
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes pipe-operator
 
       - name: Configure Git
         run: |
