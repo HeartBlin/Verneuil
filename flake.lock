@@ -31,18 +31,18 @@
         "type": "github"
       }
     },
-    "flux": {
+    "fluxgrow": {
       "locked": {
-        "lastModified": 1792788378,
-        "narHash": "sha256-uyLuXdUJL2mGvD+M7RXakZVY5/BLtVsAUYi2T8iivW8=",
+        "lastModified": 1792790791,
+        "narHash": "sha256-rzoeHLoboVP4crfgeUD63mewCqvOboLIqHlyUawU9AA=",
         "owner": "HeartBlin",
-        "repo": "Flux",
-        "rev": "2b1af1ba97bfa81afaf4749b95ca152b6f47107d",
+        "repo": "FluxGrow",
+        "rev": "fc977d528f46468400f7b92146c013d54f3a8837",
         "type": "github"
       },
       "original": {
         "owner": "HeartBlin",
-        "repo": "Flux",
+        "repo": "FluxGrow",
         "type": "github"
       }
     },
@@ -126,7 +126,7 @@
     },
     "root": {
       "inputs": {
-        "flux": "flux",
+        "fluxgrow": "fluxgrow",
         "hjem": "hjem",
         "lanzaboote": "lanzaboote",
         "nixpkgs": "nixpkgs"
